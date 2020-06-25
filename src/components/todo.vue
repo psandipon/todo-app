@@ -6,7 +6,7 @@
     <v-row justify="center" align="center">
       <v-card width="800px" style="z-index: 3;">
         <v-row>
-          <v-col cols="111">
+          <v-col cols="11">
             <v-row>
               <v-icon
                 x-large
