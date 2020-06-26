@@ -15,15 +15,14 @@
                 style="opacity:.3"
               >mdi-chevron-down</v-icon>
               <v-text-field
-                class="ml-0 title pa-2 font-italic custom-placeholer-color"
-                style="font-size: 2.5rem !important; color:#9E9E9E;"
-                v-model="todo.task"
-                label="Outlined"
-                placeholder="What needs to be done ?"
                 solo
                 flat
-                @keyup.enter="addTodo()"
                 hide-details
+                @keyup.enter="addTodo()"
+                v-model="todo.task"
+                placeholder="What needs to be done ?"
+                style="font-size: 1.9rem !important; color:#9E9E9E;"
+                class="ml-0 title pa-2 font-italic custom-placeholer-color"
               ></v-text-field>
             </v-row>
           </v-col>
@@ -64,7 +63,7 @@
                   ></v-text-field>
                 </v-col>
                 <v-col cols="1" v-if="hover && todo.status==0 && todo.show">
-                  <v-btn icon>
+                  <v-btn icon @click="deleteItem(i)">
                     <v-icon color="grey lighten-1">mdi-close</v-icon>
                   </v-btn>
                 </v-col>
@@ -92,6 +91,7 @@
       <v-card width="750px" height="10px" style="z-index: 2;"></v-card>
       <v-card width="700px" height="10px" style="z-index: 1;"></v-card>
     </v-row>
+    <v-snackbar right top v-model="snackbar" :timeout="1000" :color="snackbarColor">{{snackbarText}}</v-snackbar>
   </v-container>
 </template>
 
@@ -106,57 +106,51 @@ export default {
       task: "",
       status: 0,
       show: true
-    }
+    },
+    snackbarText: "",
+    snackbarColor: "",
+    snackbar: false
   }),
 
   methods: {
+    deleteItem(i) {
+      this.todos.splice(i, 1);
+    },
     changeDecision(val) {
       this.decision = val;
     },
     updateToDone(todo) {
-      if (todo.status == 0) {
-        todo.status = 1;
-      } else {
-        todo.status = 0;
-      }
+      todo.status = todo.status ? 0 : 1;
     },
     getIcon(todo) {
-      if (todo.status == 0) {
-        return "";
-      } else {
-        return "mdi-check";
-      }
+      return todo.status ? "mdi-check" : "";
     },
     getClass(todo) {
-      if (todo.status == 0) {
-        return "";
-      } else {
-        return "text-decoration-line-through ; ";
-      }
+      return todo.status ? "text-decoration-line-through" : "";
     },
     getTodoStyle(todo) {
-      if (todo.status == 0) {
-        return "";
-      } else {
-        return "color:#E5E1E5";
-      }
+      return todo.status ? "color:#E5E1E5" : "";
     },
     getTodoClass(todo) {
-      if (todo.status == 0) {
-        return "";
-      } else {
-        return "  red red--text";
-      }
+      return todo.status ? "red red--text" : "";
     },
     addTodo() {
-      this.todos.push(this.todo);
-      this.todo = {
-        task: "",
-        status: 0,
-        show: true
-      };
+      if (!this.todo.task.length) {
+        this.snackbar = true;
+        this.snackbarText = "Nothing to add";
+        this.snackbarColor = "red";
+      } else {
+        this.snackbar = true;
+        this.snackbarText = "Task Added";
+        this.snackbarColor = "green";
 
-      console.log(this.todos);
+        this.todos.push(this.todo);
+        this.todo = {
+          task: "",
+          status: 0,
+          show: true
+        };
+      }
     },
     clearCompleted() {
       this.todos = this.todos.filter(obj => {
